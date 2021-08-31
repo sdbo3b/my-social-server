@@ -7,18 +7,14 @@ router.post("/", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await UserModel.findOne({ email });
-    if (!user) res.status(404).json("user not found");
+    if (!user) return res.status(404).json("user not found");
 
-    const validPassword = await UserModel.correctPassword(
-      password,
-      user.password
-    );
-    if (!validPassword) res.status(400).json("wrong password");
+    const validPassword = UserModel.correctPassword(password, user.password);
+    if (!validPassword) return res.status(400).json("wrong password");
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
-    console.error(err);
-    res.status(500);
+    return res.status(500).json("Server Error");
   }
 });
 

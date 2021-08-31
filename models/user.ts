@@ -2,6 +2,7 @@ import { Model, Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 
 interface IUser {
+  _id: string;
   username: string;
   email: string;
   password: string;
@@ -10,12 +11,18 @@ interface IUser {
   followers: string[];
   following: string[];
   isAdmin: boolean;
+  desc: string;
+  city: string;
+  from: string;
+  relationship: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface UserModel extends Model<IUser> {
-  createSalt(): Promise<string>;
-  createHash(plainPassword: string, salt: string): Promise<string>;
-  correctPassword(password: string, userPassword: string): Promise<boolean>;
+  createSalt(): string;
+  createHash(plainPassword: string, salt: string): string;
+  correctPassword(password: string, userPassword: string): boolean;
 }
 
 const UserSchema = new Schema<IUser, UserModel>(
@@ -58,20 +65,36 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: Boolean,
       default: false,
     },
+    desc: {
+      type: String,
+      max: 50,
+    },
+    city: {
+      type: String,
+      max: 50,
+    },
+    from: {
+      type: String,
+      max: 50,
+    },
+    relationship: {
+      type: Number,
+      enum: [1, 2, 3],
+    },
   },
   { timestamps: true }
 );
 
-UserSchema.statics.createSalt = async function () {
-  return await bcrypt.genSalt(10);
+UserSchema.statics.createSalt = function () {
+  return bcrypt.genSaltSync(10);
 };
 
-UserSchema.statics.createHash = async function (plainPassword, salt) {
-  return await bcrypt.hash(plainPassword, salt);
+UserSchema.statics.createHash = function (plainPassword, salt) {
+  return bcrypt.hashSync(plainPassword, salt);
 };
 
-UserSchema.statics.correctPassword = async function (password, userPassword) {
-  return await bcrypt.compare(password, userPassword);
+UserSchema.statics.correctPassword = function (password, userPassword) {
+  return bcrypt.compareSync(password, userPassword);
 };
 
 export default model<IUser, UserModel>("User", UserSchema);

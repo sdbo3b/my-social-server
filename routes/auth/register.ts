@@ -10,15 +10,15 @@ router.post("/", async (req, res) => {
     const newUser = new UserModel({
       username,
       email,
-      password: UserModel.createHash(password, await UserModel.createSalt()),
+      password: UserModel.createHash(password, UserModel.createSalt()),
     });
 
     // Save user in DB and return response
     const user = await newUser.save();
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
     console.error(err);
-    res.status(500);
+    return res.status(500).json("Server Error");
   }
 });
 
