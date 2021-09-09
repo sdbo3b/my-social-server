@@ -46,11 +46,16 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// get
+// get user
 
-router.get("/:id", async (req, res) => {
+router.get("/", async (req, res) => {
+  const userId: any = req.query.userId;
+  const username: any = req.query.username;
+
   try {
-    const user = await UserModel.findById(req.params.id);
+    const user = userId
+      ? await UserModel.findById(userId)
+      : await UserModel.findOne({ username });
     const { password, updatedAt, ...props } = user.toObject();
     res.status(200).json(props);
   } catch (err) {
@@ -97,6 +102,33 @@ router.put("/:id/unfollow", async (req, res) => {
     }
   } else {
     res.status(403).json("Invalid request: cannot unfollow yourself");
+  }
+});
+
+// get friends
+
+router.get("/friends/:userId", async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.userId);
+    const friends = await Promise.all(
+      user.following.map((friendId) => {
+        return UserModel.findById(friendId);
+      })
+    );
+
+    let friendList: {
+      _id: string;
+      username: string;
+      profilePicture: string;
+    }[] = [];
+    friends.map((friend) => {
+      const { _id, username, profilePicture } = friend;
+      friendList.push({ _id, username, profilePicture });
+    });
+
+    res.status(200).json(friendList);
+  } catch (err) {
+    res.status(500).json(err);
   }
 });
 

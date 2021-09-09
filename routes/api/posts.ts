@@ -92,4 +92,16 @@ router.get("/timeline/:userId", async (req, res) => {
   }
 });
 
+// get all users posts
+
+router.get("/profile/:username", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ username: req.params.username });
+    const posts = await PostModel.find({ userId: user._id });
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 export default router;

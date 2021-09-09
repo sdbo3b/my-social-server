@@ -4,13 +4,29 @@ import UserModel from "../../models/user";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { username, email, password } = req.body;
+  const {
+    username,
+    email,
+    password,
+    profilePicture,
+    coverPicture,
+    from,
+    city,
+    desc,
+    relationship,
+  } = req.body;
 
   try {
     const newUser = new UserModel({
       username,
       email,
       password: UserModel.createHash(password, UserModel.createSalt()),
+      profilePicture,
+      coverPicture,
+      from,
+      city,
+      desc,
+      relationship,
     });
 
     // Save user in DB and return response
